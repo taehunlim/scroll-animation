@@ -12,7 +12,6 @@ const styles = css`
 
    html,
    body {
-      overflow: hidden;
       height: 100%;
 
       @supports (-webkit-touch-callout: none) {
