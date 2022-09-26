@@ -9,7 +9,7 @@ import { useEffectOnce } from '../useEffectOnce';
 import { defaultAnimation } from './defaultAnimation';
 import { AnimationProps, StylesProps } from './model';
 
-import styledComponent from './style';
+import styledComponent, { StyledSlideProps } from './style';
 
 interface Props {
    children: ReactNode;
@@ -21,9 +21,7 @@ type ElementProps = HTMLDivElement & {
    };
 };
 
-interface AnimationsProps extends AnimationProps {
-   animation: AnimationProps[];
-}
+type AnimationsProps = AnimationProps & StyledSlideProps;
 
 const { Container, Sticky, SlideContainer, StyledSlide } = styledComponent;
 
@@ -106,33 +104,35 @@ const ScrollAnimation = ({ children }: Props) => {
    ) {
       if (!animations) return;
 
-      animations.animation.map((animation) => {
-         const { start: a_start, end: a_end, easing, styles } = animation;
-         const isIn = isAmong(currentCenterPosition, a_start, a_end);
-         // 만약 애니메이션이 새롭게 들어갈 때 혹은 나갈때 enabled 설정
-         if (isIn) {
-            if (!animation.enabled) animation.enabled = true;
-         }
-
-         if (!isIn && animation.enabled) {
-            if (currentCenterPosition <= a_start) {
-               applyStyles(target, styles, 0);
+      if (animations.animation) {
+         animations.animation.map((animation) => {
+            const { start: a_start, end: a_end, easing, styles } = animation;
+            const isIn = isAmong(currentCenterPosition, a_start, a_end);
+            // 만약 애니메이션이 새롭게 들어갈 때 혹은 나갈때 enabled 설정
+            if (isIn) {
+               if (!animation.enabled) animation.enabled = true;
             }
 
-            if (currentCenterPosition >= a_end) {
-               applyStyles(target, styles, 1);
-            }
-            animation.enabled = false;
-         }
+            if (!isIn && animation.enabled) {
+               if (currentCenterPosition <= a_start) {
+                  applyStyles(target, styles, 0);
+               }
 
-         // 애니메이션이 enabled 라면, 애니메이션 적용.
-         if (animation.enabled) {
-            const keyframe = easing(
-               (currentCenterPosition - a_start) / (a_end - a_start),
-            );
-            applyStyles(target, styles, keyframe);
-         }
-      });
+               if (currentCenterPosition >= a_end) {
+                  applyStyles(target, styles, 1);
+               }
+               animation.enabled = false;
+            }
+
+            // 애니메이션이 enabled 라면, 애니메이션 적용.
+            if (animation.enabled) {
+               const keyframe = easing(
+                  (currentCenterPosition - a_start) / (a_end - a_start),
+               );
+               applyStyles(target, styles, keyframe);
+            }
+         });
+      }
    }
 
    function applyStyles(
@@ -141,11 +141,10 @@ const ScrollAnimation = ({ children }: Props) => {
       keyframe: number,
    ) {
       Object.keys(styles).map((style) => {
-         console.log(styles, style);
+         const styleValues = styles[style];
 
-         if (styles[style]) {
-            const [startValue, endValue] = styles[style];
-
+         if (styleValues?.length) {
+            const [startValue, endValue] = styleValues;
             const calc = (endValue - startValue) * keyframe + startValue;
 
             applyStyle(target, style, calc);
