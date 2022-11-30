@@ -8,10 +8,21 @@ export interface AnimationProps {
    enabled?: boolean;
 }
 
-interface StringKey {
-   [key: string]: number[] | undefined;
-}
+type ExceptStyleDeclaration =
+   | 'readonly parentRule'
+   | 'setProperty'
+   | 'getPropertyPriority'
+   | 'getPropertyValue'
+   | 'item'
+   | 'removeProperty';
 
-export type StylesProps = StringKey & {
-   [Key in keyof CSSStyleDeclaration]?: number[];
+export type CSSStyleRule = Omit<CSSStyleDeclaration, ExceptStyleDeclaration> & {
+   [index: string]: string;
+
+   translateY: string;
+   translateX: string;
+};
+
+export type StylesProps = {
+   [Key in keyof CSSStyleRule]?: number[];
 };

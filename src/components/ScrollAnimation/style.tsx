@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 import { AnimationProps } from 'components/ScrollAnimation/model';
 
-interface StyledSlideProps {
+export interface StyledSlideProps {
    animation?: AnimationProps[];
 }
 

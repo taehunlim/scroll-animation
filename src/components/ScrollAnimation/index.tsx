@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { useEffectOnce } from '../useEffectOnce';
 import { defaultAnimation } from './defaultAnimation';
-import { AnimationProps, StylesProps } from './model';
+import { AnimationProps, CSSStyleRule, StylesProps } from './model';
 
 import styledComponent, { StyledSlideProps } from './style';
 
@@ -15,10 +15,10 @@ interface Props {
    children: ReactNode;
 }
 
+type StyleNameProps = keyof CSSStyleRule;
+
 type ElementProps = HTMLDivElement & {
-   style: {
-      [key: string]: string | number;
-   };
+   style: CSSStyleRule;
 };
 
 type AnimationsProps = AnimationProps & StyledSlideProps;
@@ -46,7 +46,7 @@ const ScrollAnimation = ({ children }: Props) => {
 
    function applyStyle(
       element: ElementProps,
-      styleName: string,
+      styleName: StyleNameProps,
       value: number,
    ) {
       if (styleName === 'translateY') {
@@ -57,7 +57,7 @@ const ScrollAnimation = ({ children }: Props) => {
          element.style.transform = `translateX(${value}%)`;
          return;
       }
-      return (element.style[styleName] = value);
+      return (element.style[styleName] = `${value}`);
    }
 
    function onScroll(slides: HTMLCollectionOf<ElementProps>) {
